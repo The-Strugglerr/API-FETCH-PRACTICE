@@ -5,7 +5,7 @@ const countriesContainer = document.querySelector('.countries');
 
 ///////////////////////////////////////
 
-const addContry = function (data, className = '') {
+const renderCountry = function (data, className = '') {
   const propertyValuesLanguages = Object.values(data.languages);
   const propertyValuesCurrencies = Object.values(data.currencies);
 
@@ -32,29 +32,26 @@ const addContry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
-const getCountryAndNeighbour = function (con) {
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.com/v3.1/name/${con}`);
-  request.send();
-  request.addEventListener('load', function () {
-    const [data] = JSON.parse(this.responseText);
-    console.log(data);
-    //first country
-    addContry(data);
+/*
+using fetch methods it will immediately return a promise and in beginning this promsise will be stilll pending and at some point this promise will get settle , it it will be fulfilled then it will return something and that response we handle with then method, it is only take one parameter that is the response from fetch method.in this response we have a body property in which we have all the data so to acces it we need to use another method called json but above is problem this json is also asynchronous function so it will also return a promise so we need to return it and then call again a then method.
+*/
 
-    // neighbouring country
-    const [neighbour] = data.borders;
+// const addContry = function (con) {
+//   fetch(`https://restcountries.com/v3.1/name/${con}`)
+//     .then(function (response) {
+//       return response.json();
+//     })
+//     .then(function (data) {
+//       console.log(data);
+//     });
+// };
 
-    if (!neighbour) return;
-    const request1 = new XMLHttpRequest();
-    request1.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
-    request1.send();
-    request1.addEventListener('load', function () {
-      const [data1] = JSON.parse(this.responseText);
-      console.log(data1);
-      addContry(data1, 'neighbour');
-    });
-  });
+// lets use arrow function to simplfy above
+
+const addContry = function (con) {
+  fetch(`https://restcountries.com/v3.1/name/${con}`)
+    .then(response => response.json())
+    .then(data => renderCountry(data[0]));
 };
 
-getCountryAndNeighbour('india');
+addContry('india');
