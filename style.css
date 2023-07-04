@@ -11,8 +11,8 @@ html {
 
 body {
   font-family: system-ui;
-  color: #555;
-  background-color: #f7f7f7;
+  color: #d9d1d1;
+  background-color: wheat;
   min-height: 100vh;
 
   display: flex;
@@ -36,7 +36,7 @@ body {
 }
 
 .country {
-  background-color: #fff;
+  background-color: #281818;
   box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
   font-size: 1.8rem;
   width: 30rem;
