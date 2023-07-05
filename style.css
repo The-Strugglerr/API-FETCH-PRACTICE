@@ -11,7 +11,7 @@ html {
 
 body {
   font-family: system-ui;
-  color: #d9d1d1;
+  color: #523e96;
   background-color: wheat;
   min-height: 100vh;
 
@@ -106,6 +106,7 @@ body {
   color: white;
   background-color: orangered;
   cursor: pointer;
+  margin-top: 30px;
 }
 
 .images {

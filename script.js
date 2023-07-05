@@ -3,8 +3,6 @@
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
-///////////////////////////////////////
-
 const renderCountry = function (data, className = '') {
   const propertyValuesLanguages = Object.values(data.languages);
   const propertyValuesCurrencies = Object.values(data.currencies);
@@ -32,29 +30,50 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
+// Promisifying the Geolocation API
 /*
-Implementation of neighbors how to overcome the callback hell here see
-rememeber one thing what a then method return is always a fullfill value.
-i will add ss to it below.
+
+Lets start with navigator.geolocation.getCurrentPosition(positon ,err) this code block is used for access the current position of the user if take two call backs first is position other is err it will give position if you give permission to find the location otherwise it will return error.
+
+
+Now lets promisify this:
+we know promise method take two parameters first resolve and if any error happens then it will return rejected
 
 */
-
-const addContry = function (con) {
-  fetch(`https://restcountries.com/v3.1/name/${con}`)
-    .then(response => response.json())
-    .then(data => {
-      console.log(data[0]);
-      renderCountry(data[0]);
-      const noOfNeighbors = data[0].borders.length;
-      if (!noOfNeighbors) return;
-      const random = Math.floor(Math.random() * noOfNeighbors);
-
-      const neighbor = data[0].borders[random];
-      console.log(neighbor);
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`);
-    })
-    .then(response => response.json())
-    .then(data => renderCountry(data[0], 'neighbour'));
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      position => resolve(position),
+      err => reject(err)
+    );
+  });
 };
 
-addContry('pakistan');
+const whereAmI = function () {
+  getPosition()
+    .then(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      return fetch(`https://restcountries.com/v3.1/name/india`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Country not found (${res.status})`);
+
+      return res.json();
+    })
+    .then(data => {
+      renderCountry(data[0]);
+    })
+    .catch(err => console.error(`${err.message} 💥`));
+};
+
+btn.addEventListener('click', whereAmI);
