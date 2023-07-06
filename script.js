@@ -30,50 +30,53 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
-// Promisifying the Geolocation API
+// ASYNC AND WAIT
 /*
+it is a new feature that comes after promises it makes the work of promises more efficient and easier to understand.
 
-Lets start with navigator.geolocation.getCurrentPosition(positon ,err) this code block is used for access the current position of the user if take two call backs first is position other is err it will give position if you give permission to find the location otherwise it will return error.
+by adding async in front of fucntion we make it asynchronous it means it will keep executing in the background while perforing code inside it.
+
+inside the async function we can have one or more await statements.
+
+here await will stop the execution of further code inside the async function until it get promise.
+
+this is same as await function
+fetch(`https://restcountries.com/v3.1/name/${con}`).then(function (response) {
+  console.log(response);
+});
+here res is storing the result value of await, and it is a promise.
 
 
-Now lets promisify this:
-we know promise method take two parameters first resolve and if any error happens then it will return rejected
+there is one problem in this we donot have any error handling thing in motion so lets fix that in next video.
+
 
 */
+
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition(
-      position => resolve(position),
-      err => reject(err)
-    );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
 
-const whereAmI = function () {
-  getPosition()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
+const whereAmI = async function (con) {
+  const geoPos = await getPosition();
 
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      console.log(`You are in ${data.city}, ${data.country}`);
+  // reverse geocoding
+  const { latitude: lat, longitude: lon } = geoPos.coords;
+  const getMeLoc = await fetch(`https://geocode.xyz/${lat},${lon}?geoit=json`);
+  const getmeCon = await getMeLoc.json();
 
-      return fetch(`https://restcountries.com/v3.1/name/india`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Country not found (${res.status})`);
+  console.log(getmeCon);
+  console.log(getmeCon.country);
 
-      return res.json();
-    })
-    .then(data => {
-      renderCountry(data[0]);
-    })
-    .catch(err => console.error(`${err.message} 💥`));
+  const res = await fetch(
+    `https://restcountries.com/v3.1/name/${getmeCon.country}`
+  );
+  const data = await res.json();
+
+  renderCountry(data[0]);
 };
 
-btn.addEventListener('click', whereAmI);
+btn.addEventListener('click', function () {
+  whereAmI('india');
+});
