@@ -30,28 +30,6 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
-// ASYNC AND WAIT
-/*
-it is a new feature that comes after promises it makes the work of promises more efficient and easier to understand.
-
-by adding async in front of fucntion we make it asynchronous it means it will keep executing in the background while perforing code inside it.
-
-inside the async function we can have one or more await statements.
-
-here await will stop the execution of further code inside the async function until it get promise.
-
-this is same as await function
-fetch(`https://restcountries.com/v3.1/name/${con}`).then(function (response) {
-  console.log(response);
-});
-here res is storing the result value of await, and it is a promise.
-
-
-there is one problem in this we donot have any error handling thing in motion so lets fix that in next video.
-
-
-*/
-
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
